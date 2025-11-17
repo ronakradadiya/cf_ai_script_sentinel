@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import puppeteer from "@cloudflare/puppeteer";
 import type { Env, AnalysisResult, ScriptInfo } from "../types";
+import { analyzeScript } from "./analyzer";
 
 export { ScriptAnalyzer } from "../durable-objects/ScriptAnalyzer";
 
@@ -18,7 +19,7 @@ app.get("/", (c) => {
   });
 });
 
-// Main analysis endpoint with REAL browser automation
+// Main analysis endpoint with AI
 app.post("/analyze", async (c) => {
   try {
     const { url } = await c.req.json<{ url: string }>();
@@ -27,7 +28,6 @@ app.post("/analyze", async (c) => {
       return c.json({ error: "URL is required" }, 400);
     }
 
-    // Validate URL
     try {
       new URL(url);
     } catch {
@@ -43,7 +43,6 @@ app.post("/analyze", async (c) => {
     const scripts: ScriptInfo[] = [];
     const pageDomain = new URL(url).hostname;
 
-    // Intercept all script requests
     await page.setRequestInterception(true);
 
     page.on("request", (req) => {
@@ -68,49 +67,35 @@ app.post("/analyze", async (c) => {
       req.continue();
     });
 
-    // Multi-strategy loading with fallbacks
+    // Load page with fallback strategy
     let loadSuccess = false;
-    let loadError: Error | null = null;
 
     // Strategy 1: Try networkidle2 (balanced)
     try {
-      console.log("[Script Sentinel] Attempting load with networkidle2...");
+      console.log("[Script Sentinel] Loading with networkidle2...");
       await page.goto(url, {
         waitUntil: "networkidle2",
         timeout: 45000,
       });
       loadSuccess = true;
-      console.log("[Script Sentinel] Page loaded successfully");
-    } catch (error) {
-      console.log(
-        "[Script Sentinel] networkidle2 failed, trying domcontentloaded..."
-      );
-      loadError = error as Error;
-
-      // Strategy 2: Fallback to domcontentloaded (faster, less strict)
+    } catch {
+      console.log("[Script Sentinel] Fallback to domcontentloaded...");
+      // Strategy 2: Fallback to domcontentloaded
       try {
         await page.goto(url, {
           waitUntil: "domcontentloaded",
           timeout: 30000,
         });
         loadSuccess = true;
-        console.log("[Script Sentinel] Page loaded with domcontentloaded");
 
         // Give time for scripts to load after DOM ready
         await new Promise((resolve) => setTimeout(resolve, 5000));
       } catch (fallbackError) {
-        console.error("[Script Sentinel] All load strategies failed");
         await browser.close();
-
         return c.json(
           {
             error: "Failed to load page",
-            message:
-              "The website could not be loaded. It may be blocking automated browsers, timing out, or requiring authentication.",
-            attempts: {
-              networkidle2: loadError?.message || "failed",
-              domcontentloaded: (fallbackError as Error).message,
-            },
+            message: "The website could not be loaded.",
           },
           504
         );
@@ -134,12 +119,27 @@ app.post("/analyze", async (c) => {
       }
     });
 
+    console.log(
+      `[Script Sentinel] Found ${thirdPartyScripts.length} third-party scripts`
+    );
+    console.log("[Script Sentinel] Starting AI analysis...");
+
+    // Analyze each script with AI
+    const analyses = await Promise.all(
+      thirdPartyScripts.slice(0, 10).map(
+        (script) => analyzeScript(script, pageDomain, c.env) // ← Add pageDomain
+      )
+    );
+
+    console.log("[Script Sentinel] AI analysis complete");
+
     const result: AnalysisResult = {
       success: true,
       url: url,
       totalScripts: scripts.length,
       thirdPartyScripts: thirdPartyScripts.length,
       scripts: thirdPartyScripts,
+      analyses: analyses,
     };
 
     // Store in Durable Object
@@ -153,17 +153,12 @@ app.post("/analyze", async (c) => {
         body: JSON.stringify(result),
       });
     } catch (storageError) {
-      console.error("[Script Sentinel] Failed to store result:", storageError);
-      // Continue anyway - analysis succeeded
+      console.error("[Script Sentinel] Storage error:", storageError);
     }
-
-    console.log(
-      `[Script Sentinel] Found ${thirdPartyScripts.length} third-party scripts`
-    );
 
     return c.json(result);
   } catch (error) {
-    console.error("[Script Sentinel] Analysis error:", error);
+    console.error("[Script Sentinel] Error:", error);
     return c.json(
       {
         error: "Analysis failed",
@@ -174,16 +169,15 @@ app.post("/analyze", async (c) => {
   }
 });
 
-// Chat endpoint (placeholder for now)
+// Chat endpoint (placeholder)
 app.post("/chat", async (c) => {
   try {
     const { message } = await c.req.json<{ message: string }>();
 
     return c.json({
-      reply: `You asked: "${message}". AI chat coming in next phase!`,
+      reply: `You asked: "${message}". Full chat coming soon!`,
     });
   } catch (error) {
-    console.error("Chat error:", error);
     return c.json({ error: "Chat failed" }, 500);
   }
 });

@@ -1,0 +1,23 @@
+name = "cf-ai-script-sentinel"
+main = "src/worker/index.ts"
+compatibility_date = "2025-01-01"
+
+# Browser automation
+[browser]
+binding = "MYBROWSER"
+
+# AI binding - FIXED (object, not array)
+[ai]
+binding = "AI"
+remote = true
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "SCRIPT_ANALYZER"
+class_name = "ScriptAnalyzer"
+script_name = "cf-ai-script-sentinel"
+
+# KV namespace
+[[kv_namespaces]]
+binding = "CACHE"
+id = "cf2893a010254ffb8663077de8d6ec68"

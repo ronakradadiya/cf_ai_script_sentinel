@@ -2,6 +2,10 @@
 
 A full-stack web security application that analyzes third-party JavaScript on websites using Cloudflare Workers, Puppeteer, and AI to detect potential security risks.
 
+## 🚀 Live Demo
+
+**URL**: https://cf-ai-script-sentinel.pages.dev
+
 ## 🌟 Features
 
 - **Automated Script Detection**: Crawls websites and identifies all third-party JavaScript files
@@ -18,10 +22,6 @@ A full-stack web security application that analyzes third-party JavaScript on we
 - **AI**: Cloudflare AI (Llama 3.1 70B)
 - **Storage**: Durable Objects + KV
 - **Deployment**: Cloudflare Pages (Frontend) + Cloudflare Workers (Backend)
-
-## 🚀 Live Demo
-
-**URL**: https://cf-ai-script-sentinel.pages.dev
 
 ## 📋 Prerequisites
 

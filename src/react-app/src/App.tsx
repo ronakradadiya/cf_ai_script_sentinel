@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import { API_BASE_URL } from "./constants";
 
 interface ScriptInfo {
   url: string;
@@ -59,7 +60,7 @@ function App() {
     setChatMessages([]);
 
     try {
-      const response = await fetch("/analyze", {
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
@@ -73,7 +74,7 @@ function App() {
       setAnalysis(data);
 
       // Initialize chat session
-      await fetch("/chat/init", {
+      await fetch(`${API_BASE_URL}/chat/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, analysisData: data }),
@@ -99,7 +100,7 @@ function App() {
     setChatLoading(true);
 
     try {
-      const response = await fetch("/chat", {
+      const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

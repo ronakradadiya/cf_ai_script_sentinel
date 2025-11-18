@@ -6,16 +6,6 @@ export default defineConfig({
 
   server: {
     port: 5173,
-    proxy: {
-      "/analyze": {
-        target: "http://localhost:8787",
-        changeOrigin: true,
-      },
-      "/chat": {
-        target: "http://localhost:8787",
-        changeOrigin: true,
-      },
-    },
   },
 
   build: {

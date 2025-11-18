@@ -66,3 +66,28 @@ export interface RuntimeEvent {
   value?: string;
   key?: string;
 }
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+}
+
+export interface ChatRequest {
+  message: string;
+  sessionId: string;
+  analysisContext?: AnalysisResult;
+}
+
+export interface ChatResponse {
+  reply: string;
+  timestamp: number;
+}
+
+export interface ChatSession {
+  sessionId: string;
+  messages: ChatMessage[];
+  analysisData?: AnalysisResult;
+  createdAt: number;
+  lastActive: number;
+}

@@ -179,6 +179,21 @@ function App() {
     }
   };
 
+  const getRiskExplanation = (level: string) => {
+    switch (level) {
+      case "LOW":
+        return "Safe to use - minimal concerns";
+      case "MEDIUM":
+        return "Monitor this - collects data";
+      case "HIGH":
+        return "Caution - privacy risks";
+      case "CRITICAL":
+        return "Dangerous - should block";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="App">
       <header>
@@ -193,7 +208,7 @@ function App() {
             placeholder="Enter website URL (e.g., https://example.com)"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && analyzeWebsite()}
+            onKeyPress={(e) => e.key === "Enter" && analyzeWebsite()}
           />
           <button onClick={analyzeWebsite} disabled={loading}>
             {loading ? "Analyzing..." : "Analyze Website"}
@@ -232,6 +247,55 @@ function App() {
               </div>
             </div>
 
+            {/* Risk Legend */}
+            <div className="risk-legend">
+              <h3>🎯 Risk Level Guide</h3>
+              <div className="legend-items">
+                <div className="legend-item">
+                  <span
+                    className="legend-badge"
+                    style={{ background: "#10b981" }}
+                  >
+                    🟢 LOW RISK
+                  </span>
+                  <span className="legend-text">
+                    Safe - Legitimate services
+                  </span>
+                </div>
+                <div className="legend-item">
+                  <span
+                    className="legend-badge"
+                    style={{ background: "#f59e0b" }}
+                  >
+                    🟡 MEDIUM RISK
+                  </span>
+                  <span className="legend-text">
+                    Monitor - Tracks user data
+                  </span>
+                </div>
+                <div className="legend-item">
+                  <span
+                    className="legend-badge"
+                    style={{ background: "#ef4444" }}
+                  >
+                    🟠 HIGH RISK
+                  </span>
+                  <span className="legend-text">
+                    Caution - Privacy concerns
+                  </span>
+                </div>
+                <div className="legend-item">
+                  <span
+                    className="legend-badge"
+                    style={{ background: "#dc2626" }}
+                  >
+                    🔴 CRITICAL RISK
+                  </span>
+                  <span className="legend-text">Dangerous - Should block</span>
+                </div>
+              </div>
+            </div>
+
             {/* Chat Interface */}
             <div className="chat-section">
               <h3>💬 Ask Questions About This Analysis</h3>
@@ -244,10 +308,12 @@ function App() {
                         <button
                           className="question-button"
                           onClick={() =>
-                            handleQuickQuestion("Why are these scripts risky?")
+                            handleQuickQuestion(
+                              "Which top 3 scripts should I monitor?"
+                            )
                           }
                         >
-                          🔍 Why are these risky?
+                          🔍 Top scripts to monitor
                         </button>
                         <button
                           className="question-button"
@@ -260,18 +326,22 @@ function App() {
                         <button
                           className="question-button"
                           onClick={() =>
-                            handleQuickQuestion("Should I block any scripts?")
+                            handleQuickQuestion(
+                              "What are the biggest privacy risks?"
+                            )
                           }
                         >
-                          🚫 Should I block any?
+                          🚫 Biggest risks?
                         </button>
                         <button
                           className="question-button"
                           onClick={() =>
-                            handleQuickQuestion("Explain this in simple terms")
+                            handleQuickQuestion(
+                              "Summarize this in 3 key points"
+                            )
                           }
                         >
-                          💡 Explain simply
+                          💡 Quick summary
                         </button>
                       </div>
                     </div>
@@ -344,12 +414,17 @@ function App() {
                       <h4>
                         {getRiskEmoji(script.riskLevel)} {script.scriptName}
                       </h4>
-                      <span
-                        className="risk-badge"
-                        style={{ background: getRiskColor(script.riskLevel) }}
-                      >
-                        {getRiskLabel(script.riskLevel)}
-                      </span>
+                      <div className="risk-badge-container">
+                        <span
+                          className="risk-badge"
+                          style={{ background: getRiskColor(script.riskLevel) }}
+                        >
+                          {getRiskLabel(script.riskLevel)}
+                        </span>
+                        <span className="risk-explanation">
+                          {getRiskExplanation(script.riskLevel)}
+                        </span>
+                      </div>
                     </div>
 
                     <p className="purpose">

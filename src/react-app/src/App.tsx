@@ -60,7 +60,7 @@ function App() {
     setChatMessages([]);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
@@ -74,7 +74,7 @@ function App() {
       setAnalysis(data);
 
       // Initialize chat session
-      await fetch(`${API_BASE_URL}/chat/init`, {
+      await fetch(`${API_BASE_URL}/api/v1/chat/init`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, analysisData: data }),
@@ -100,7 +100,7 @@ function App() {
     setChatLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/chat`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

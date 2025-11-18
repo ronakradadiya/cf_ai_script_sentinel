@@ -20,8 +20,11 @@ app.get("/", (c) => {
   });
 });
 
+// Group routes under /api/v1
+const api = new Hono<{ Bindings: Env }>();
+
 // Main analysis endpoint with AI
-app.post("/analyze", async (c) => {
+api.post("/analyze", async (c) => {
   try {
     const { url } = await c.req.json<{ url: string }>();
 
@@ -172,7 +175,7 @@ app.post("/analyze", async (c) => {
   }
 });
 
-app.post("/chat", async (c) => {
+api.post("/chat", async (c) => {
   try {
     const { message, sessionId, analysisContext } =
       await c.req.json<ChatRequest>();
@@ -236,7 +239,7 @@ app.post("/chat", async (c) => {
   }
 });
 
-app.post("/chat/init", async (c) => {
+api.post("/chat/init", async (c) => {
   try {
     const { sessionId, analysisData } = await c.req.json<{
       sessionId: string;
@@ -257,5 +260,7 @@ app.post("/chat/init", async (c) => {
     return c.json({ error: "Failed to init chat" }, 500);
   }
 });
+
+app.route("/api/v1", api);
 
 export default app;

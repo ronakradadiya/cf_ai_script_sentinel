@@ -121,7 +121,8 @@ function App() {
     } catch (err) {
       const errorMessage: ChatMessage = {
         role: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
+        content:
+          "Sorry, there was an error answering your question. The AI may have been overloaded. Please ask again with a specific question.",
         timestamp: Date.now(),
       };
       setChatMessages((prev) => [...prev, errorMessage]);
@@ -208,7 +209,7 @@ function App() {
             placeholder="Enter website URL (e.g., https://example.com)"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && analyzeWebsite()}
+            onKeyDown={(e) => e.key === "Enter" && analyzeWebsite()}
           />
           <button onClick={analyzeWebsite} disabled={loading}>
             {loading ? "Analyzing..." : "Analyze Website"}
@@ -303,7 +304,15 @@ function App() {
                 <div className="chat-messages">
                   {chatMessages.length === 0 && (
                     <div className="chat-placeholder">
-                      <p>Ask me anything about the detected scripts:</p>
+                      <p>
+                        <strong>Tip:</strong> Ask about a specific script or
+                        risk to get the most relevant, detailed answer.
+                        <br />
+                        <span>
+                          Broad questions like “list all scripts” will show only
+                          the quickest summary.
+                        </span>
+                      </p>
                       <div className="suggested-questions">
                         <button
                           className="question-button"

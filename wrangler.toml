@@ -16,9 +16,12 @@ remote = true
 [[durable_objects.bindings]]
 name = "SCRIPT_ANALYZER"
 class_name = "ScriptAnalyzer"
-script_name = "cf-ai-script-sentinel"
 
 # KV namespace
 [[kv_namespaces]]
 binding = "CACHE"
 id = "cf2893a010254ffb8663077de8d6ec68"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["ScriptAnalyzer"]

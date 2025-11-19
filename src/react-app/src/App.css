@@ -653,6 +653,8 @@ main {
 
   .chat-messages {
     height: 300px;
+    scroll-behavior: smooth;
+    overflow-y: auto;
   }
 
   .chat-message {

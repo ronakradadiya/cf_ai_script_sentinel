@@ -49,7 +49,6 @@ ${context}`;
     );
 
     if (reply.length > 1800 && !reply.trim().endsWith(".")) {
-      // Remove trailing incomplete word.
       reply =
         reply.slice(0, reply.lastIndexOf(" ")) +
         "\n\n⚠️ Response truncated. Ask for specific details if needed.";

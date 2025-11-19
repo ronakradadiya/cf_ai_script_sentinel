@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { API_BASE_URL } from "./constants";
 
@@ -47,6 +47,16 @@ function App() {
   const [sessionId] = useState<string>(
     () => `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   );
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages, chatLoading]);
 
   const analyzeWebsite = async () => {
     if (!url) {
@@ -302,7 +312,7 @@ function App() {
             <div className="chat-section">
               <h3>💬 Ask Questions About This Analysis</h3>
               <div className="chat-container">
-                <div className="chat-messages">
+                <div className="chat-messages" ref={chatContainerRef}>
                   {chatMessages.length === 0 && (
                     <div className="chat-placeholder">
                       <p>
@@ -383,6 +393,8 @@ function App() {
                       </div>
                     </div>
                   )}
+
+                  <div ref={messagesEndRef} />
                 </div>
 
                 <div className="chat-input-container">
